@@ -40,6 +40,8 @@ class Server:
         parameters = json.dumps(parameters)
         self.conn.send(parameters.encode())
 
+    import json
+
     def run(self):
         print("Server started")
         while True:
@@ -50,7 +52,7 @@ class Server:
             if not data:
                 break
             # Converte os dados recebidos em um objeto JSON
-            dado = json.loads(str(data))
+            dado = json.loads(data)
 
             # Extrai o valor de 'PID_OUTPUT' dos dados
             data = dado["PID_OUTPUT"]
@@ -61,9 +63,13 @@ class Server:
             # Calcula o valor de VP com base em data
             VP = self.calculate_VP(data)
 
+            print(f"VP no servidor: {VP}")
+
             # Convert o valor de VP para JSON e o codifica em bytes
             data = self.convert_vp_output_to_json(VP).encode()
 
+            # Se usar o frontend, descomente a linha abaixo
+            yield VP
             # Envia os dados de volta para o cliente
             self.conn.send(data)
 
@@ -73,4 +79,5 @@ class Server:
 
 if __name__ == '__main__':
     server = Server()
+    server.set_pid_parameters(setpoint=25, Kp=1, Ki=0.5, Kd=0, PID_FLAG=True)
     server.run()

@@ -16,7 +16,6 @@ reset = False
 class VpGetter:
     def __init__(self):
         self.server = Server()
-        self.server.set_pid_parameters()
         self.vp = self.server.run()
 
     def output(self):
@@ -24,15 +23,14 @@ class VpGetter:
         while True:
             try:
                 if reset:
-
                     output_VP = []
                     self.server.set_pid_parameters(
                         pid_parameters['setpoint'], pid_parameters['Kp'], pid_parameters['Ki'], pid_parameters['Kd'], PID_FLAG=True)
                     reset = False
                 else:
                     vp = next(self.vp)
-                    vp = float(vp)
                     print(f"VP: {vp}")
+                    vp = float(vp)
                     time.sleep(1)
                     output_VP.append(vp)
             except StopIteration:
@@ -112,18 +110,18 @@ class HomePage:
     def run(self):
         port = 8050
         print(f"Dashboard rodando em: http://127.0.0.1:{port}")
-        self.app.run_server(debug=False)
+        self.app.run_server(debug=True)
 
 
 if __name__ == "__main__":
-    vp_getter = VpGetter()
-    home_page = HomePage()
-    t1 = threading.Thread(target=vp_getter.output)
-    t2 = threading.Thread(target=home_page.run)
+    # vp_getter = VpGetter()
+    # home_page = HomePage()
+    # t1 = threading.Thread(target=vp_getter.output)
+    # t2 = threading.Thread(target=home_page.run)
 
-    t1.start()
-    t2.start()
+    # t1.start()
+    # t2.start()
 
-    t1.join()
-    t2.join()
-    # HomePage().run()
+    # t1.join()
+    # t2.join()
+    HomePage().run()

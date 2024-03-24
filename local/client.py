@@ -77,8 +77,8 @@ class Client:
 
             counter += 1
 
-            if counter > 100:
-                break
+            # if counter > 100:
+            #     break
 
         self.client_socket.close()  # close the connection
         self.plot()
