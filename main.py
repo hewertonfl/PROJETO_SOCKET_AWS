@@ -23,7 +23,7 @@ class VpGetter:
         while True:
             try:
                 if reset:
-                    output_VP = []
+                    # output_VP = []
                     self.server.set_pid_parameters(
                         pid_parameters['setpoint'], pid_parameters['Kp'], pid_parameters['Ki'], pid_parameters['Kd'], PID_FLAG=True)
                     reset = False
@@ -110,18 +110,18 @@ class HomePage:
     def run(self):
         port = 8050
         print(f"Dashboard rodando em: http://127.0.0.1:{port}")
-        self.app.run_server(debug=True)
+        self.app.run_server(debug=False)
 
 
 if __name__ == "__main__":
-    # vp_getter = VpGetter()
-    # home_page = HomePage()
-    # t1 = threading.Thread(target=vp_getter.output)
-    # t2 = threading.Thread(target=home_page.run)
+    vp_getter = VpGetter()
+    home_page = HomePage()
+    t1 = threading.Thread(target=vp_getter.output)
+    t2 = threading.Thread(target=home_page.run)
 
-    # t1.start()
-    # t2.start()
+    t1.start()
+    t2.start()
 
-    # t1.join()
-    # t2.join()
-    HomePage().run()
+    t1.join()
+    t2.join()
+    # HomePage().run()

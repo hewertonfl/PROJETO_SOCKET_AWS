@@ -52,7 +52,11 @@ class Server:
             if not data:
                 break
             # Converte os dados recebidos em um objeto JSON
-            dado = json.loads(data)
+            try:
+                dado = json.loads(data)
+            except json.JSONDecodeError:
+                print("Erro ao decodificar JSON")
+                continue
 
             # Extrai o valor de 'PID_OUTPUT' dos dados
             data = dado["PID_OUTPUT"]
