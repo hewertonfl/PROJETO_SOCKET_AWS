@@ -38,45 +38,47 @@ class Client:
             print(
                 f"Setpoint: {self.setpoint}, Kp: {self.Kp}, Ki: {self.Ki}, Kd: {self.Kd}")
 
-    def convert_pid_to_json(self, message):
+    def convert_pid_output_to_json(self, message):
         message = {"PID_OUTPUT": str(message)}
         message = json.dumps(message)
         return message
 
-    def run(self):
+    def send_message(self, PID_FLAG=False, response=None):
+        if PID_FLAG:
+            self.load_pid_settings(response)
         message = self.controller.PID(
             self.setpoint, self.Kp, self.Ki, self.Kd, self.VP)
+        message = self.convert_pid_output_to_json(message)
+        self.client_socket.send(message.encode())
+
+    def run(self):
         counter = 0
-        while message != 0:
-            # Convert the PID message to JSON and encode it
-            message_json = self.convert_pid_to_json(message)
-            message_bytes = json.dumps(message_json).encode("utf-8")
-
-            # Send the message
-            self.client_socket.send(message_bytes)
-
+        while True:
             # Receive the response
-            data = self.client_socket.recv(1024).decode()
+            response = self.client_socket.recv(1024).decode()
+            response_dict = json.loads(response)
 
-            VP = json.loads(data)
-            if VP["PID_FLAG"]:
-                self.load_pid_settings(VP)
-                message = self.controller.PID(
-                    self.setpoint, self.Kp, self.Ki, self.Kd, self.VP)
-                continue
-            elif not VP["PID_FLAG"]:
-                continue
-            else:
-                VP = float(VP["PID_OUTPUT"])
-                self.output.append(VP)
-
-                # Update the message with the new PID
-                message = self.controller.PID(
-                    self.setpoint, self.Kp, self.Ki, self.Kd, VP)
+            # Check if the response is a PID message
+            if "PID_FLAG" in response_dict.keys():
+                self.send_message(response=response_dict,
+                                  PID_FLAG=response_dict["PID_FLAG"])
                 counter += 1
+                continue
 
-            # if counter > 100:
-            #     break
+            # Load the PID output
+            PID_RESPONSE = response_dict["VP_OUTPUT"]
+            self.VP = float(PID_RESPONSE)
+
+            # Save a list of the VP values
+            self.output.append(self.VP)
+
+            # Send the response to the server
+            self.send_message(response=self.VP)
+
+            counter += 1
+
+            if counter > 100:
+                break
 
         self.client_socket.close()  # close the connection
         self.plot()

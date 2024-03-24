@@ -15,10 +15,17 @@ class Server:
         self.previous_VP = 0
         self.output = []
 
-    def VP(self, PID_OUTPUT):
+        self.set_pid_parameters()
+
+    def calculate_VP(self, PID_OUTPUT):
         # G = 2/(2s+3)
         VP = 0.7408*self.previous_VP + 0.1728 * PID_OUTPUT
         return VP
+
+    def convert_vp_output_to_json(self, message):
+        message = {"VP_OUTPUT": str(message)}
+        message = json.dumps(message)
+        return message
 
     def set_pid_parameters(self, setpoint=None, Kp=None, Ki=None, Kd=None, PID_FLAG=False):
         if PID_FLAG:
@@ -37,18 +44,13 @@ class Server:
         print("Server started")
         while True:
             # Recebe os dados do cliente
-            data = self.conn.recv(1024).decode("utf-8")
+            data = self.conn.recv(1024).decode()
 
             # Se não houver dados, encerra o loop
             if not data:
                 break
-
-            print(data)
             # Converte os dados recebidos em um objeto JSON
             dado = json.loads(str(data))
-
-            # Imprime o tipo dos dados
-            print(dado)
 
             # Extrai o valor de 'PID_OUTPUT' dos dados
             data = dado["PID_OUTPUT"]
@@ -56,8 +58,11 @@ class Server:
             # Converte 'PID_OUTPUT' em um float
             data = float(data)
 
-            # Chama a função VP com 'data' como argumento, converte o resultado em JSON e codifica em bytes
-            data = json.dumps(self.VP(data)).encode("utf-8")
+            # Calcula o valor de VP com base em data
+            VP = self.calculate_VP(data)
+
+            # Convert o valor de VP para JSON e o codifica em bytes
+            data = self.convert_vp_output_to_json(VP).encode()
 
             # Envia os dados de volta para o cliente
             self.conn.send(data)
@@ -68,6 +73,4 @@ class Server:
 
 if __name__ == '__main__':
     server = Server()
-    # server.set_pid_parameters(10, 1, 0.5, 0, PID_FLAG=True)
-    server.set_pid_parameters()
     server.run()
