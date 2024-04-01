@@ -2,6 +2,7 @@
 
 Este projeto implementa um sistema de controle em nuvem usando **Python** e **Socket** para comunicação entre o servidor e o cliente. O servidor é responsável por executar a planta (ou processo) que precisa ser controlado, enquanto o cliente é responsável pelo controle e monitoramento.
 
+![Dashboard](https://github.com/hewertonfl/PROJETO_SOCKET_AWS/blob/master/assets/dashboard.png)
 ## Funcionalidades
 
 -   **Servidor**:
