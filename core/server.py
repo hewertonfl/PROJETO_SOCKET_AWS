@@ -40,8 +40,6 @@ class Server:
         parameters = json.dumps(parameters)
         self.conn.send(parameters.encode())
 
-    import json
-
     def run(self):
         print("Server started")
         while True:

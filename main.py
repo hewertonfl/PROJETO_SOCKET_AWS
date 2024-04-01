@@ -2,7 +2,7 @@ import dash
 from dash import dcc
 from dash import html
 from components import sidebar, main_content, header
-from local.server import Server
+from core.server import Server
 import threading
 import numpy as np
 from collections import deque
@@ -23,7 +23,6 @@ class VpGetter:
         while True:
             try:
                 if reset:
-                    # output_VP = []
                     self.server.set_pid_parameters(
                         pid_parameters['setpoint'], pid_parameters['Kp'], pid_parameters['Ki'], pid_parameters['Kd'], PID_FLAG=True)
                     reset = False

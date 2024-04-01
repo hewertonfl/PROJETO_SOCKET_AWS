@@ -8,7 +8,7 @@ import json
 class Client:
     def __init__(self):
         host = socket.gethostname()
-        # host = "3.213.7.49"
+        host = "54.198.239.48"
         port = 5000
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client_socket.connect((host, port))
